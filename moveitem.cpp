@@ -43,7 +43,7 @@ void MoveItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
      * в координатную систему графической сцены
      * */
      emit SetNum(number,time);// отправка номера и веса точки
-    this->setPos(mapToScene(event->pos().x()+20,event->pos().y()+20));// установка координат точки на месте курсора
+    if(this->neighbors.isEmpty())this->setPos(mapToScene(event->pos().x()+20,event->pos().y()+20));// установка координат точки на месте курсора
 
 }
 
