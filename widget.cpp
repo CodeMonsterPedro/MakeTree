@@ -119,7 +119,7 @@ bool Widget::Check(int next)// рекурсивная функция прове�
         if(points[i]->number==next)next=i;
     }
 
-    if(points[next]->neighbors.length()==1&&points[next]->number==ui->spinBox_3->value())return true;// тут что-то не так!!!!
+    if(points[next]->neighbors.length()==1&&points[next]->number==ui->spinBox_3->value())return true;
     if(points[next]->neighbors.length()>1)// если соседей больше одного то мы посещяем точку
     {
         points[next]->burn=true;// отметка что точка была посещена
@@ -148,6 +148,7 @@ void Widget::BaseAlgo()// основная функция алгоритма
     {
         points[i]->burn=false;
     }
+    points[mainA-1]->score=0;
     NextStep(mainA);// вызов функции расчета цен и пути к точкам
     for(int i=0;i<points.size();i++)// обнуление данных о посещениях
     {
@@ -168,7 +169,6 @@ void Widget::NextStep(int current)
         if(points[current]->neighbors[i]->score>=(points[current]->time[i]+points[current]->score))
             // если очки на соседе больше чем сумма очков текущей точки и связи с соседом то очкам соседа присваивается сумма связи и очков точки
         {
-        // тут что-то не так
             points[current]->neighbors[i]->score=(points[current]->time[i]+points[current]->score);
             points[current]->neighbors[i]->scoreway=points[current]->scoreway;
             points[current]->neighbors[i]->scoreway.append(points[current]->neighbors[i]->number);
