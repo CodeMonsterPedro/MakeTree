@@ -33,6 +33,8 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_pushButton_3_clicked();
+
 private:
     Ui::Widget *ui;
     QGraphicsScene *scene;
@@ -44,6 +46,8 @@ private:
     void BaseAlgo();
     void NextStep(int current);
     void ShowTheWay();
+    bool TreeCheck();
+    void ReCreateGraf();
 
 
 

@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QLineF>
 #include <QStatusBar>
+#include <QGraphicsItemGroup>
 
 /* Функция для получения рандомного числа
  * в диапазоне от минимального до максимального
@@ -180,7 +181,7 @@ void Widget::NextStep(int current)
     }
 
 }
-
+//Внедерение функции построения дерева
 void Widget::ShowTheWay()
 {
  QMessageBox msg;
@@ -191,4 +192,26 @@ void Widget::ShowTheWay()
  }
  msg.setText(str);
  msg.exec();
+}
+
+void Widget::on_pushButton_3_clicked()
+{
+    if(!TreeCheck()) break;
+    ReCreateGraf();
+}
+
+bool Widget::TreeCheck()
+{
+    bool flag1=false;
+    for(int i=0;i<points.size();i++)
+    {
+        if(!points[i]->neighbors.size()>=2)flag1=true;
+    }
+    return flag1;
+}
+
+void Widget::ReCreateGraf()
+{
+QGraphicsItemGroup ItmGrp;
+    scene->destroyItemGroup();
 }
