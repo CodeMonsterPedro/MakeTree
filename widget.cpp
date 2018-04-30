@@ -169,7 +169,7 @@ void Widget::NextStep(int current)
         if(points[current]->neighbors[i]->score>=(points[current]->time[i]+points[current]->score))
             // если очки на соседе больше чем сумма очков текущей точки и связи с соседом то очкам соседа присваивается сумма связи и очков точки
         {
-        // тут что-то не так
+
             points[current]->neighbors[i]->score=(points[current]->time[i]+points[current]->score);
             points[current]->neighbors[i]->scoreway=points[current]->scoreway;
             points[current]->neighbors[i]->scoreway.append(points[current]->neighbors[i]->number);
@@ -194,24 +194,33 @@ void Widget::ShowTheWay()
  msg.exec();
 }
 
+
+
+
 void Widget::on_pushButton_3_clicked()
 {
-    if(!TreeCheck()) break;
+    TreeCheck(ui->spinBox_2->value());
+    for(int i=0;i<points.size();i++)if(points[i]->waytohere>1)return;
+
+    for(int i=0;i<points.size();i++)if(points[i]->neighbors.isEmpty())points[i]->hide();
     ReCreateGraf();
+
 }
 
-bool Widget::TreeCheck()
+void Widget::TreeCheck(int current)
 {
-    bool flag1=false;
-    for(int i=0;i<points.size();i++)
+    for(int i=0;i<points.size();i++)// цыкл нахождения индекса точки в массиве
     {
-        if(!points[i]->neighbors.size()>=2)flag1=true;
+        if(points[i]->number==current)current=i;
     }
-    return flag1;
+    points[current]->waytohere++;
+    points[current]->burn=true;
+    for(int i=0;i<points[current]->neighbors.size();i++)if(points[current]->neighbors[i]->neighbors.size()==1)points[current]->neighbors[i]->burn=true;
+    for(int i=0;i<points[current]->neighbors.size();i++)if(!points[current]->neighbors[i]->burn)TreeCheck(points[current]->neighbors[i]->number);
 }
 
 void Widget::ReCreateGraf()
 {
-QGraphicsItemGroup ItmGrp;
-    scene->destroyItemGroup();
+
+
 }

@@ -17,6 +17,7 @@ class MoveItem : public QObject, public QGraphicsItem
 public:
     QVector<MoveItem*> neighbors;// массив точек присоединенных к этой точке
     bool burn=false;//была ли посещена точка
+    int waytohere=0;
     int number;// номер точки
     int score=3000;//очки точки
     QVector<int> time;// веса связей точки точки

@@ -46,7 +46,7 @@ private:
     void BaseAlgo();
     void NextStep(int current);
     void ShowTheWay();
-    bool TreeCheck();
+    void TreeCheck(int current);
     void ReCreateGraf();
 
 
