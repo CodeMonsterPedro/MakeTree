@@ -52,12 +52,15 @@ void Widget::on_pushButton_clicked()
     connect(item, SIGNAL(SetNum(int,QVector<int>)),this,SLOT(TakeToSetNum(int,QVector<int>)));// подключение функции получения номера точки
     points.push_back(item);// добавление точки в массив точек
     scene->addItem(item);   // Добавляем элемент на графическую сцену
+  //  scene->addText(QString::number(12));
     }
 
     for(int i=0;i<ui->spinBox->value();i++)
     {
         points[i]->number=i+1;// присвоение номера точке
-        //points[i]->time=i+10;// присвоения веса точке
+
+       // points[i]->numlabel.setText(QString::number(i+1));
+        //points[i]->numlabel.show();
     }
 }
 

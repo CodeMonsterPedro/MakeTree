@@ -16,7 +16,7 @@ MoveItem::~MoveItem()
 
 QRectF MoveItem::boundingRect() const
 {
-    return QRectF (-30,-30,20,20);// ограничение области за которую можно схватить объект
+    return QRectF (-30,-30,20,30);// ограничение области за которую можно схватить объект
 }
 
 void MoveItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -24,6 +24,7 @@ void MoveItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->setPen(Qt::black);// черные границы точек
     painter->setBrush(Qt::green);// зеленая заливка точки
     painter->drawEllipse(-30,-30,20,20);// отрисовка самой точки
+    painter->drawText(-25,2,QString::number(this->number));
     Q_UNUSED(option);// освобождение памяти не используемых переменных
     Q_UNUSED(widget);// освобождение памяти не используемых переменных
 }
@@ -43,8 +44,11 @@ void MoveItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
      * в координатную систему графической сцены
      * */
      emit SetNum(number,time);// отправка номера и веса точки
-    if(this->neighbors.isEmpty())this->setPos(mapToScene(event->pos().x()+20,event->pos().y()+20));// установка координат точки на месте курсора
+    if(this->neighbors.isEmpty())
+    {
+        this->setPos(mapToScene(event->pos().x()+20,event->pos().y()+20));// установка координат точки на месте курсора
 
+    }
 }
 
 void MoveItem::mousePressEvent(QGraphicsSceneMouseEvent *event)

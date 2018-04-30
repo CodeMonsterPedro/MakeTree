@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QCursor>
 #include <QMessageBox>
+#include <QLabel>
 
 
 
@@ -22,6 +23,7 @@ public:
     int score=3000;//очки точки
     QVector<int> time;// веса связей точки точки
     QVector<int> scoreway;// путь по которму нужно пройти от точки начала до данной чтобы получить ее вес
+    QLabel numlabel;
     explicit MoveItem(QObject *parent = 0);
     ~MoveItem();
 void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);// функция ответа на двойной клик по точке
