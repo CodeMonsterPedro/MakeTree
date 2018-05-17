@@ -19,11 +19,10 @@ public:
     QVector<MoveItem*> neighbors;// массив точек присоединенных к этой точке
     bool burn=false;//была ли посещена точка
     int waytohere=0;
-    int number;// номер точки
+    int number=0;// номер точки
     int score=3000;//очки точки
     QVector<int> time;// веса связей точки точки
     QVector<int> scoreway;// путь по которму нужно пройти от точки начала до данной чтобы получить ее вес
-    QLabel numlabel;
     explicit MoveItem(QObject *parent = 0);
     ~MoveItem();
 void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);// функция ответа на двойной клик по точке

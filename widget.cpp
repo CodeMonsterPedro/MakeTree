@@ -33,6 +33,8 @@ Widget::Widget(QMainWindow *parent) :
     ui->graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
 
     scene->setSceneRect(0,0,800,800); // Устанавливаем размер сцены
+    ui->pushButton_2->setEnabled(false);
+    ui->pushButton_3->setEnabled(false);
 }
 
 Widget::~Widget()
@@ -42,7 +44,9 @@ Widget::~Widget()
 
 void Widget::on_pushButton_clicked()
 {
+    ui->pushButton_3->setEnabled(false);
     scene->clear(); //очистка сцены
+    ui->pushButton_2->setEnabled(true);
     for(int i=1;i<ui->spinBox->value()+1;i++)// цыкл создания точек по количеству в сцетчике
     {
     MoveItem *item = new MoveItem();        // Создаём графический элемент
@@ -51,17 +55,11 @@ void Widget::on_pushButton_clicked()
     connect(item, SIGNAL(SendPos(QPointF)),this,SLOT(TakePos(QPointF)));// подключение функции получения позиции точки
     connect(item, SIGNAL(SetNum(int,QVector<int>)),this,SLOT(TakeToSetNum(int,QVector<int>)));// подключение функции получения номера точки
     points.push_back(item);// добавление точки в массив точек
+    item->number=i;// присвоение номера точке
     scene->addItem(item);   // Добавляем элемент на графическую сцену
-  //  scene->addText(QString::number(12));
     }
 
-    for(int i=0;i<ui->spinBox->value();i++)
-    {
-        points[i]->number=i+1;// присвоение номера точке
 
-       // points[i]->numlabel.setText(QString::number(i+1));
-        //points[i]->numlabel.show();
-    }
 }
 
 void Widget::TakePos(QPointF cords)// функция рисования связей между точками
@@ -98,6 +96,7 @@ void Widget::TakeToSetNum(int num,QVector<int> time)// функция отобр
 
 void Widget::on_pushButton_2_clicked()// функция проверки перед началом главного алгоритма
 {
+    ui->pushButton_3->setEnabled(true);
     if(ui->spinBox_2->value()==ui->spinBox_3->value())// проверка не указал ли пользователь путь в одну и ту же точку
     {
         QMessageBox msg;
@@ -148,6 +147,8 @@ void Widget::BaseAlgo()// основная функция алгоритма
     msg.exec();// сообщение пользователю о том что начинается проложение маршрута
     mainA=ui->spinBox_2->value();
     mainB=ui->spinBox_3->value();
+    points[mainA-1]->score=0;
+    points[mainA-1]->scoreway.append(mainA);
     for(int i=0;i<points.size();i++)// обнуление данных о посещении точек
     {
         points[i]->burn=false;
@@ -193,28 +194,45 @@ void Widget::ShowTheWay()
  {
      str= str + QString::number(points[mainB-1]->scoreway[i])+" ";
  }
+ str = str + "\nПуть был проложен ценой в " + QString::number(points[mainB-1]->score);
  msg.setText(str);
  msg.exec();
 }
 
 
-
-
 void Widget::on_pushButton_3_clicked()
 {
-    TreeCheck(ui->spinBox_2->value());
-    for(int i=0;i<points.size();i++)if(points[i]->waytohere>1)return;
+    for(int i=0;i<points.size();i++)if(points[i]->neighbors.size()!=0)Treepoints.append(points[i]);else points[i]->hide();
+    items=scene->items();
+    for(int i=0;i<items.size();i++)
+        if(items[i]->type()==6)scene->removeItem(items[i]);
+    //TreeCheck(mainB-1);
+    //for(int i=0;i<points.size();i++)if(points[i]->waytohere>1)return;
+    for(int i=0;i<Treepoints.size();i++)// цыкл нахождения индекса точки в массиве
+    {
+        if(Treepoints[i]->number==mainA)mainA=i;
+    }
+    if(Treepoints[mainA]->neighbors.size()>1)
+    {
+        Treepoints[mainA]->setPos(10,10);
+        Treepoints[mainA]->neighbors[0]->setPos(Treepoints[mainA]->x()+20,Treepoints[mainA]->y());
+        for(int i=1;i<Treepoints[mainA]->neighbors.size();i++)Treepoints[mainA]->neighbors[i]->setPos(Treepoints[mainA]->x()+20,Treepoints[mainA]->neighbors[i-1]->y()+20);
+        for(int i=0;i<Treepoints[mainA]->neighbors.size();i++)
+        {
+            QLineF pointer(Treepoints[mainA]->pos(),Treepoints[mainA]->neighbors[i]->pos());// ресуется связь между ранее выбраной и новой точкой
+            scene->addLine(pointer);
+            if(Treepoints[mainA]->neighbors[i]->neighbors.size()>1)ReCreateGraf(Treepoints[mainA]->neighbors[i]->number);
+        }
 
-    for(int i=0;i<points.size();i++)if(points[i]->neighbors.isEmpty())points[i]->hide();
-    ReCreateGraf();
+    }
 
 }
 
 void Widget::TreeCheck(int current)
 {
-    for(int i=0;i<points.size();i++)// цыкл нахождения индекса точки в массиве
+    for(int i=0;i<Treepoints.size();i++)// цыкл нахождения индекса точки в массиве
     {
-        if(points[i]->number==current)current=i;
+        if(Treepoints[i]->number==current)current=i;
     }
     points[current]->waytohere++;
     points[current]->burn=true;
@@ -222,8 +240,20 @@ void Widget::TreeCheck(int current)
     for(int i=0;i<points[current]->neighbors.size();i++)if(!points[current]->neighbors[i]->burn)TreeCheck(points[current]->neighbors[i]->number);
 }
 
-void Widget::ReCreateGraf()
+void Widget::ReCreateGraf(int current)
 {
+    for(int i=0;i<Treepoints.size();i++)// цыкл нахождения индекса точки в массиве
+    {
+        if(Treepoints[i]->number==current)current=i;
+    }
+    Treepoints[current]->neighbors[0]->setPos(Treepoints[current]->x()+20,Treepoints[current]->y());
+    for(int i=1;i<Treepoints[current]->neighbors.size();i++)Treepoints[current]->neighbors[i]->setPos(Treepoints[current]->x()+20,Treepoints[current]->neighbors[i-1]->y()+20);
+    for(int i=0;i<Treepoints[current]->neighbors.size();i++)
+    {
+            QLineF pointer(Treepoints[current]->pos(),Treepoints[current]->neighbors[i]->pos());// ресуется связь между ранее выбраной и новой точкой
+            scene->addLine(pointer);
+            if(Treepoints[current]->neighbors[i]->neighbors.size()>1)ReCreateGraf(Treepoints[current]->neighbors[i]->number);
 
+    }
 
 }

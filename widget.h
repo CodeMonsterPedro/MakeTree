@@ -39,7 +39,9 @@ private:
     Ui::Widget *ui;
     QGraphicsScene *scene;
     QVector<QPointF> LineVec;// масссив для рисования связей
+    QList<QGraphicsItem *> items;
     QVector<MoveItem*> points;// главный массив точек
+    QVector<MoveItem*> Treepoints;
     QVector<int> visited;// массив посещенных элементов
     int mainA=0,mainB=0;// Номера выбранных точек дл япросчета пути
     bool Check(int next);
@@ -47,7 +49,7 @@ private:
     void NextStep(int current);
     void ShowTheWay();
     void TreeCheck(int current);
-    void ReCreateGraf();
+    void ReCreateGraf(int current);
 
 
 

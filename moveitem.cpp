@@ -4,8 +4,7 @@
 MoveItem::MoveItem(QObject *parent) :
     QObject(parent), QGraphicsItem()
 {
-    //this->setCursor(QCursor(QT::));
-    //temparray=LineVec;
+
     //connect(this, SIGNAL(SendPos(QPointF)),SLOT(Widget::TakePos(QPointF)));
 }
 
