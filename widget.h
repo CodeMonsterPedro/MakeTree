@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QPoint>
 #include <QVector>
+#include <QPainter>
 
 
 #include <moveitem.h>
@@ -35,6 +36,8 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_pushButton_4_clicked();
+
 private:
     Ui::Widget *ui;
     QGraphicsScene *scene;
@@ -47,7 +50,7 @@ private:
     bool Check(int next);
     void BaseAlgo();
     void NextStep(int current);
-    void ShowTheWay();
+    void ShowTheWay(int point);
     void TreeCheck(int current);
     void ReCreateGraf(int current);
 

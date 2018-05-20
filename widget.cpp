@@ -4,6 +4,7 @@
 #include <QLineF>
 #include <QStatusBar>
 #include <QGraphicsItemGroup>
+#include <QPen>
 
 /* Функция для получения рандомного числа
  * в диапазоне от минимального до максимального
@@ -35,6 +36,9 @@ Widget::Widget(QMainWindow *parent) :
     scene->setSceneRect(0,0,800,800); // Устанавливаем размер сцены
     ui->pushButton_2->setEnabled(false);
     ui->pushButton_3->setEnabled(false);
+    ui->pushButton_4->hide();
+    ui->spinBox_4->hide();
+
 }
 
 Widget::~Widget()
@@ -158,7 +162,7 @@ void Widget::BaseAlgo()// основная функция алгоритма
     {
         points[i]->burn=false;
     }
-    ShowTheWay();// вывод информации о завершении алгоритма
+    ShowTheWay(mainB);// вывод информации о завершении алгоритма
 }
 
 void Widget::NextStep(int current)
@@ -186,15 +190,19 @@ void Widget::NextStep(int current)
 
 }
 //Внедерение функции построения дерева
-void Widget::ShowTheWay()
+void Widget::ShowTheWay(int point)
 {
+    for(int i=0;i<points.size();i++)// цыкл нахождения индекса точки в массиве
+    {
+        if(points[i]->number==point)point=i;
+    }
  QMessageBox msg;
  QString str="Найден путь от точки с номером "+QString::number(mainA) + " до точки с номером "+QString::number(mainB) + ".\nОптимальный путь проложен через последовательность\nточек ";
- for(int i=0;i<points[mainB-1]->scoreway.size();i++)
+ for(int i=0;i<points[point]->scoreway.size();i++)
  {
-     str= str + QString::number(points[mainB-1]->scoreway[i])+" ";
+     str= str + QString::number(points[point]->scoreway[i])+" ";
  }
- str = str + "\nПуть был проложен ценой в " + QString::number(points[mainB-1]->score);
+ if(points[point]->number==ui->spinBox_3->value())str = str + "\nПуть был проложен ценой в " + QString::number(points[mainB-1]->score);
  msg.setText(str);
  msg.exec();
 }
@@ -214,18 +222,48 @@ void Widget::on_pushButton_3_clicked()
     }
     if(Treepoints[mainA]->neighbors.size()>1)
     {
-        Treepoints[mainA]->setPos(10,10);
-        Treepoints[mainA]->neighbors[0]->setPos(Treepoints[mainA]->x()+20,Treepoints[mainA]->y());
-        for(int i=1;i<Treepoints[mainA]->neighbors.size();i++)Treepoints[mainA]->neighbors[i]->setPos(Treepoints[mainA]->x()+20,Treepoints[mainA]->neighbors[i-1]->y()+20);
+        Treepoints[mainA]->burn=true;
+        Treepoints[mainA]->setPos(QPointF(10.0,10.0));
+        Treepoints[mainA]->neighbors[0]->setPos(QPointF(Treepoints[mainA]->x()+100.0,Treepoints[mainA]->y()));
+        for(int i=1;i<Treepoints[mainA]->neighbors.size();i++)
+            Treepoints[mainA]->neighbors[i]->setPos(QPointF(Treepoints[mainA]->x()+100.0,Treepoints[mainA]->neighbors[i-1]->y()+100.0));
         for(int i=0;i<Treepoints[mainA]->neighbors.size();i++)
         {
-            QLineF pointer(Treepoints[mainA]->pos(),Treepoints[mainA]->neighbors[i]->pos());// ресуется связь между ранее выбраной и новой точкой
-            scene->addLine(pointer);
-            if(Treepoints[mainA]->neighbors[i]->neighbors.size()>1)ReCreateGraf(Treepoints[mainA]->neighbors[i]->number);
+            scene->addLine(Treepoints[mainA]->x()-20,Treepoints[mainA]->y()-20,Treepoints[mainA]->neighbors[i]->x()-20,Treepoints[mainA]->neighbors[i]->y()-20,QPen(Qt::green));
         }
+        for(int i=0;i<Treepoints[mainA]->neighbors.size();i++)if(Treepoints[mainA]->neighbors[i]->neighbors.size()>1)ReCreateGraf(Treepoints[mainA]->neighbors[i]->number);
+
+
+    } else if(Treepoints[mainA]->neighbors[0]->neighbors.size()>1)
+    {
+        Treepoints[mainA]->burn=true;
+        Treepoints[mainA]->neighbors[0]->burn=true;
+        Treepoints[mainA]->neighbors[0]->setPos(QPointF(10.0,10.0));
+        Treepoints[mainA]->setPos(QPointF(110.0,110.0));
+        Treepoints[mainA]->neighbors[0]->neighbors[0]->setPos(QPointF(Treepoints[mainA]->x()+100.0,Treepoints[mainA]->y()));
+        for(int i=1;i<Treepoints[mainA]->neighbors[0]->neighbors.size();i++)
+            Treepoints[mainA]->neighbors[0]->neighbors[i]->setPos(QPointF(Treepoints[mainA]->x()+100.0,Treepoints[mainA]->neighbors[i-1]->y()+100.0));
+        for(int i=0;i<Treepoints[mainA]->neighbors[0]->neighbors.size();i++)
+        {
+            scene->addLine(Treepoints[mainA]->neighbors[0]->x()-20,Treepoints[mainA]->neighbors[0]->y()-20,Treepoints[mainA]->neighbors[0]->neighbors[i]->x()-20,Treepoints[mainA]->neighbors[0]->neighbors[i]->y()-20,QPen(Qt::green));
+        }
+        for(int i=0;i<Treepoints[mainA]->neighbors[0]->neighbors.size();i++)if(Treepoints[mainA]->neighbors[0]->neighbors[i]->neighbors.size()>1)ReCreateGraf(Treepoints[mainA]->neighbors[0]->neighbors[i]->number);
 
     }
+    else return;
+    ui->pushButton->hide();
+    ui->pushButton_2->hide();
+    ui->pushButton_3->hide();
+    ui->pushButton_4->show();
+    ui->spinBox->hide();
+    ui->spinBox_2->hide();
+    ui->spinBox_3->setValue(0);
+    ui->spinBox_3->hide();
+    ui->spinBox_4->show();
+    ui->label->hide();
+    ui->label_2->hide();
 
+    mainA=ui->spinBox_2->value();
 }
 
 void Widget::TreeCheck(int current)
@@ -246,14 +284,29 @@ void Widget::ReCreateGraf(int current)
     {
         if(Treepoints[i]->number==current)current=i;
     }
-    Treepoints[current]->neighbors[0]->setPos(Treepoints[current]->x()+20,Treepoints[current]->y());
-    for(int i=1;i<Treepoints[current]->neighbors.size();i++)Treepoints[current]->neighbors[i]->setPos(Treepoints[current]->x()+20,Treepoints[current]->neighbors[i-1]->y()+20);
+    Treepoints[current]->burn=true;
+    if(!Treepoints[current]->neighbors[0]->burn)
+    {
+        Treepoints[current]->neighbors[0]->setPos(QPointF(Treepoints[current]->x()+100.0,Treepoints[current]->y()));
+        Treepoints[current]->neighbors[0]->burn=true;
+    }else
+    {
+        Treepoints[current]->neighbors[1]->setPos(QPointF(Treepoints[current]->x()+100.0,Treepoints[current]->y()));
+        Treepoints[current]->neighbors[1]->burn=true;
+    }
+    for(int i=0;i<Treepoints[current]->neighbors.size();i++)
+        if(!Treepoints[current]->neighbors[i]->burn)
+            Treepoints[current]->neighbors[i]->setPos(QPointF(Treepoints[current]->x()+100.0,Treepoints[current]->neighbors[i-1]->y()+100.0));
     for(int i=0;i<Treepoints[current]->neighbors.size();i++)
     {
-            QLineF pointer(Treepoints[current]->pos(),Treepoints[current]->neighbors[i]->pos());// ресуется связь между ранее выбраной и новой точкой
-            scene->addLine(pointer);
-            if(Treepoints[current]->neighbors[i]->neighbors.size()>1)ReCreateGraf(Treepoints[current]->neighbors[i]->number);
-
+        scene->addLine(Treepoints[current]->x()-20,Treepoints[current]->y()-20,Treepoints[current]->neighbors[i]->x()-20,Treepoints[current]->neighbors[i]->y()-20,QPen(Qt::green));
     }
+    for(int i=0;i<Treepoints[current]->neighbors.size();i++)if(Treepoints[current]->neighbors[i]->neighbors.size()>1&&!Treepoints[current]->neighbors[i]->burn)ReCreateGraf(Treepoints[current]->neighbors[i]->number);
 
+
+}
+
+void Widget::on_pushButton_4_clicked()
+{
+ShowTheWay(ui->spinBox_4->value());
 }
